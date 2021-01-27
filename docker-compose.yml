@@ -1,10 +1,8 @@
-version: '2.1'
+version: '3'
 services:
 
     unbound-mailcow:
-      build:
-        context: .
-        dockerfile: unbound/Dockerfile
+      image: registry.carlosanjos.dev/unbound
       environment:
         - TZ=${TZ}
       volumes:
@@ -58,9 +56,7 @@ services:
             - redis
 
     clamd-mailcow:
-      build:
-        context: .
-        dockerfile: clamd/Dockerfile
+      image: registry.carlosanjos.dev/clamd
       restart: always
       dns:
         - ${IPV4_NETWORK:-172.22.1}.254
@@ -75,9 +71,7 @@ services:
             - clamd
 
     rspamd-mailcow:
-      build:
-        context: .
-        dockerfile: rspamd/Dockerfile
+      image: registry.carlosanjos.dev/rspamd
       stop_grace_period: 30s
       depends_on:
         - dovecot-mailcow
@@ -107,9 +101,7 @@ services:
             - rspamd
 
     php-fpm-mailcow:
-      build:
-        context: .
-        dockerfile: phpfpm/Dockerfile
+      image: registry.carlosanjos.dev/phpfpm
       command: "php-fpm -d date.timezone=${TZ} -d expose_php=0"
       depends_on:
         - redis-mailcow
@@ -168,9 +160,7 @@ services:
             - phpfpm
 
     sogo-mailcow:
-      build:
-        context: .
-        dockerfile: sogo/Dockerfile
+      image: registry.carlosanjos.dev/sogo
       environment:
         - DBNAME=${DBNAME}
         - DBUSER=${DBUSER}
@@ -204,9 +194,7 @@ services:
             - sogo
 
     dovecot-mailcow:
-      build:
-        context: .
-        dockerfile: dovecot/Dockerfile
+      image: registry.carlosanjos.dev/dovecot
       depends_on:
         - mysql-mailcow
       dns:
@@ -267,9 +255,7 @@ services:
             - dovecot
 
     postfix-mailcow:
-      build:
-        context: .
-        dockerfile: postfix/Dockerfile
+      image: registry.carlosanjos.dev/postfix
       depends_on:
         - mysql-mailcow
       volumes:
@@ -361,9 +347,7 @@ services:
     acme-mailcow:
       depends_on:
         - nginx-mailcow
-      build:
-        context: .
-        dockerfile: acme/Dockerfile
+      image: registry.carlosanjos.dev/acme
       dns:
         - ${IPV4_NETWORK:-172.22.1}.254
       environment:
@@ -398,9 +382,7 @@ services:
             - acme
 
     netfilter-mailcow:
-      build:
-        context: .
-        dockerfile: netfilter/Dockerfile
+      image: registry.carlosanjos.dev/netfilter
       stop_grace_period: 30s
       depends_on:
         - dovecot-mailcow
@@ -423,7 +405,7 @@ services:
         - /lib/modules:/lib/modules:ro
 
     watchdog-mailcow:
-      image: mailcow/watchdog:1.86
+      image: registry.carlosanjos.dev/watchdog
       # Debug
       #command: /watchdog.sh
       dns:
@@ -484,9 +466,7 @@ services:
             - watchdog
 
     dockerapi-mailcow:
-      build:
-        context: .
-        dockerfile: dockerapi/Dockerfile
+      image: registry.carlosanjos.dev/dockerapi
       security_opt:
         - label=disable
       restart: always
@@ -504,9 +484,7 @@ services:
             - dockerapi
 
     solr-mailcow:
-      build:
-        context: .
-        dockerfile: solr/Dockerfile
+      image: registry.carlosanjos.dev/solr
       restart: always
       volumes:
         - solr-vol-1:/opt/solr/server/solr/dovecot-fts/data:Z
@@ -522,9 +500,7 @@ services:
             - solr
 
     olefy-mailcow:
-      build:
-        context: .
-        dockerfile: olefy/Dockerfile
+      image: mailcow/olefy:1.5
       restart: always
       environment:
         - TZ=${TZ}
